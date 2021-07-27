@@ -1,0 +1,959 @@
+package sportpedia;
+
+
+import java.io.*;
+import java.util.*;
+
+public class Main 
+{
+    public static String organizerName;
+    public static String playerName;
+      
+    //Array List
+    public static ArrayList<Admin> announcement = new ArrayList<Admin>();
+    public static ArrayList<Organizer> organizer = new ArrayList<Organizer>();
+    public static ArrayList<Player> player = new ArrayList<Player>();
+    public static ArrayList<Complaint> complaint = new ArrayList<Complaint>();
+    public static ArrayList<Contest> contest = new ArrayList<Contest>();
+    
+    //Method main
+    public static void main(String[] args) 
+    {
+        String dataOrganizer = "organizer.txt";
+        String dataPlayer = "player.txt";
+        String dataComplaint = "complaint.txt";
+        String dataContest = "contest.txt";
+        
+        try 
+        {
+            ObjectInputStream loadOrganizer = new ObjectInputStream(new FileInputStream(dataOrganizer));
+            organizer = (ArrayList<Organizer>) loadOrganizer.readObject();
+            loadOrganizer.close();
+      
+            ObjectInputStream loadPlayer = new ObjectInputStream(new FileInputStream(dataPlayer));
+            player = (ArrayList<Player>) loadPlayer.readObject();
+            loadPlayer.close();
+
+            ObjectInputStream loadComplaint = new ObjectInputStream(new FileInputStream(dataComplaint));
+            complaint = (ArrayList<Complaint>) loadComplaint.readObject();
+            loadComplaint.close();
+
+            ObjectInputStream loadContest = new ObjectInputStream(new FileInputStream(dataContest));
+            contest = (ArrayList<Contest>) loadContest.readObject();
+            loadContest.close();
+
+        } catch(IOException ex) {
+            System.out.println("File is empty");
+        } catch(ClassNotFoundException ex) {
+            System.out.println("ClassNotFoundException is caught");
+        }
+        
+        try
+        {
+            Scanner input = new Scanner(System.in);
+            int choice;
+
+            do
+            {
+                System.out.println("====================");
+                System.out.println("|| SPORTPEDIA APP ||");
+                System.out.println("====================");
+                System.out.println("Login as:");
+                System.out.println("1. Admin\n2. Organizer\n3. Player\n4. exit");
+                System.out.println("Enter your choice:");
+                choice = input.nextInt();
+                switch(choice)
+                {
+                    case 1:
+                    {
+                        String username, password;
+                        System.out.println("======================");
+                        System.out.println("|| MENU LOGIN ADMIN ||");
+                        System.out.println("======================");
+                        System.out.println("Username: ");
+                        username = input.nextLine();
+                        System.out.println("Password: ");
+                        password = input.nextLine();
+                        if(username.equals("admin") && password.equals("admin"))
+                        {
+                            System.out.println("Login as Admin Success! Enter to continue");
+                            enterToContinue();
+                            menuAdmin();
+                        }
+                        else
+                        {
+                            System.out.println("Wrong username or password!");
+                            enterToContinue();
+                        }
+                        break;
+                    }
+                    case 2:
+                    {
+                        String haveAccount;
+                        String username, password;
+                        String accountAvailability = "off"; // cuz cant place the else inside for looping
+                        String name, phoneNumber;
+
+                        // Check Account       
+                        do
+                        {
+                            System.out.print("Already have an account [Y/N]? ");
+                            haveAccount = input.nextLine();
+                        }while(!haveAccount.equalsIgnoreCase("N") && !haveAccount.equalsIgnoreCase("Y"));
+
+                        if(haveAccount.equals("Y")) //Already have account
+                        {
+                            do
+                            {
+                                System.out.println("==========================");
+                                System.out.println("|| MENU LOGIN ORGANIZER ||");
+                                System.out.println("==========================");
+                                System.out.println("Username: ");
+                                username = input.nextLine();
+                                System.out.println("Password: ");
+                                password = input.nextLine();
+
+                                for(int i=0;i<organizer.size();i++)
+                                {
+                                    if(organizer.get(i).getOrganizerUsername().equals(username) && organizer.get(i).getOrganizerPassword().equals(password))
+                                    {
+                                        organizerName = organizer.get(i).getOrganizerName();
+                                        accountAvailability = "on";
+                                        //Condition for registration and block system
+                                        if(organizer.get(i).getRegistrationInfo()==false)
+                                        {
+                                            System.out.println("Your account not accepted yet by admin! wait for a hour..");
+                                            enterToContinue();
+                                            return;
+                                        }
+                                        if(organizer.get(i).getBlockingInfo()==true)
+                                        {
+                                            System.out.println("Your account has been blocked by admin for violating the rules!");
+                                            enterToContinue();
+                                            return;
+                                        }
+                                    }
+                                }
+                                if(accountAvailability.equals("off"))
+                                {
+                                    System.out.println("Wrong username or password! Try again");
+                                }
+                            }while(accountAvailability.equals("off"));
+                        }
+                        else // Not have account yet
+                        {
+                            System.out.println("=============================");
+                            System.out.println("|| MENU REGISTER ORGANIZER ||");
+                            System.out.println("=============================");
+                            System.out.println("Input your full name: ");
+                            name = input.nextLine();
+                            System.out.println("Input your phone number: ");
+                            phoneNumber = input.nextLine();
+
+                            do
+                            {
+                                System.out.print("Input your username: ");
+                                username = input.nextLine();
+                                if(organizer.isEmpty())
+                                {
+                                    accountAvailability = "off";
+                                }
+                                else
+                                {
+                                    for(int i=0;i<organizer.size();i++)
+                                    {
+                                        if(organizer.get(i).getOrganizerUsername().equals(username))
+                                        {
+                                            System.out.println("Sorry, you're username already used! Try again..");
+                                            accountAvailability = "on";
+                                            break;
+                                        }
+                                        else
+                                        {
+                                            accountAvailability = "off";
+                                        }
+                                    }
+                                }
+                            }while(accountAvailability.equals("on"));
+
+                            System.out.print("Input your password: ");
+                            password = input.nextLine();
+
+                            //Add to class organizer through constructor
+                            Organizer create = new Organizer(name, phoneNumber, username, password);
+                            organizer.add(create);
+                            System.out.print("Account successfully created!");
+                        }
+                        break;
+                    }
+                    case 3:
+                    {
+                        String haveAccount;
+                        String username, password;
+                        String accountAvailability = "off"; // cuz cant place the else inside for looping
+                        String name, phoneNumber;
+
+                        // Check Account       
+                        do
+                        {
+                            System.out.print("Already have an account [Y/N]? ");
+                            haveAccount = input.nextLine();
+                        }while(!haveAccount.equalsIgnoreCase("N") && !haveAccount.equalsIgnoreCase("Y"));
+
+                        if(haveAccount.equals("Y")) //Already have account
+                        {
+                            do
+                            {
+                                System.out.println("=======================");
+                                System.out.println("|| MENU LOGIN PLAYER ||");
+                                System.out.println("=======================");
+                                System.out.println("Username: ");
+                                username = input.nextLine();
+                                System.out.println("Password: ");
+                                password = input.nextLine();
+
+                                for(int i=0;i<player.size();i++)
+                                {
+                                    if(player.get(i).getPlayerUsername().equals(username) && player.get(i).getPlayerPassword().equals(password))
+                                    {
+                                        playerName = player.get(i).getPlayerName();
+                                        accountAvailability = "on";
+                                        //Condition for registration and block system
+                                        if(player.get(i).getRegistrationInfo()==false)
+                                        {
+                                            System.out.println("Your account not accepted yet by admin! wait for a hour..");
+                                            enterToContinue();
+                                            return;
+                                        }
+                                        if(player.get(i).getBlockingInfo()==true)
+                                        {
+                                            System.out.println("Your account has been blocked by admin for violating the rules!");
+                                            enterToContinue();
+                                            return;
+                                        }
+                                    }
+                                }
+                                if(accountAvailability.equals("off"))
+                                {
+                                    System.out.println("Wrong username or password! Try again");
+                                }
+                            }while(accountAvailability.equals("off"));
+                            menuOrganizer();
+                        }
+                        else // Not have account yet
+                        {
+                            System.out.println("==========================");
+                            System.out.println("|| MENU REGISTER PLAYER ||");
+                            System.out.println("==========================");
+                            System.out.println("Input your full name: ");
+                            name = input.nextLine();
+                            System.out.println("Input your phone number: ");
+                            phoneNumber = input.nextLine();
+
+                            do
+                            {
+                                System.out.print("Input your username: ");
+                                username = input.nextLine();
+                                if(player.isEmpty())
+                                {
+                                    accountAvailability = "off";
+                                }
+                                else
+                                {
+                                    for(int i=0;i<player.size();i++)
+                                    {
+                                        if(player.get(i).getPlayerUsername().equals(username))
+                                        {
+                                            System.out.println("Sorry, you're username already used! Try again..");
+                                            accountAvailability = "on";
+                                            break;
+                                        }
+                                        else
+                                        {
+                                            accountAvailability = "off";
+                                        }
+                                    }
+                                }
+                            }while(accountAvailability.equals("on"));
+
+                            System.out.print("Input your password: ");
+                            password = input.nextLine();
+
+                            //Add to class organizer through constructor
+                            Player create = new Player(name, phoneNumber, username, password);
+                            player.add(create);
+                            System.out.print("Account successfully created!");
+                        }
+                        break;  
+                    }
+                    case 4:
+                    {
+                        saveFile(organizer, player, complaint, contest, dataOrganizer, dataPlayer, dataComplaint, dataContest);
+                    }
+                }
+            }while(choice != 4);
+        }catch(Exception e){
+            System.out.println("Menu that you enter is not found!");
+        }
+    }
+    
+    private static void saveFile(ArrayList<Organizer> organizer, ArrayList<Player> player, ArrayList<Complaint> complaint, ArrayList<Contest> contest, String dataOrganizer, String dataPlayer, String dataComplaint, String dataContest) 
+    {
+        try
+        {
+            ObjectOutputStream writeOrganizer = new ObjectOutputStream(new FileOutputStream(dataOrganizer));
+            writeOrganizer.writeObject(organizer);
+
+            ObjectOutputStream writePlayer = new ObjectOutputStream(new FileOutputStream(dataPlayer));
+            writePlayer.writeObject(player);
+
+            ObjectOutputStream writeComplaint = new ObjectOutputStream(new FileOutputStream(dataComplaint));
+            writeComplaint.writeObject(complaint);
+
+            ObjectOutputStream writeContest = new ObjectOutputStream(new FileOutputStream(dataContest));
+            writeContest.writeObject(contest);
+        }
+        catch(IOException ex)
+        {
+            System.out.println("Failed to save!");
+        }
+    }
+    
+    //Method like getch
+    public static void enterToContinue(){
+        try{
+            System.in.read();
+        }catch(Exception e){};
+    }
+    
+    //Method to display announcement
+    public static void displayAnnouncement()
+    {
+        if(!announcement.isEmpty())
+        {
+            System.out.println(" Announcement Today ");
+            System.out.println("====================");
+            for(int i=0;i<announcement.size();i++)
+            {
+                System.out.println("- " + announcement.get(i));
+            }
+        }
+        else
+        {
+            System.out.println("There's no announcement now!");
+        }
+    }
+    
+    //Method to display complaint
+    public static void displayComplaint()
+    {
+        if(complaint.isEmpty())
+        {
+            System.out.println("There's no complaint!");
+        }
+        else
+        {
+            System.out.println("========================");
+            System.out.println("||   COMPLAINT LIST   ||");
+            System.out.println("========================");
+            for(int i=0;i<complaint.size();i++)
+            {
+                System.out.println("- ");
+                complaint.get(i).displayInfo();
+            }
+        }
+    }    
+    
+    //Method to block accounts
+    public static void blockAccount()
+    {
+        int choice, blockedNumber;
+        Scanner input = new Scanner(System.in);
+        
+        System.out.println("====================");
+        System.out.println("||   BLOCK MENU   ||");
+        System.out.println("====================");
+        System.out.println("1. Organizer\n2. Player");
+        System.out.print("Enter your choice: ");
+        choice = input.nextInt();
+        if(choice == 1)
+        {
+            if(organizer.isEmpty())
+            {
+                System.out.println("There's no organizer account!");
+            }
+            else
+            {
+                System.out.println("========================");
+                System.out.println("||   ORGANIZER LIST   ||");
+                System.out.println("========================");
+                for(int i = 0;i<organizer.size();i++)
+                {
+                    System.out.println((1+i) + " ");
+                    organizer.get(i).displayInfo();
+                }
+                System.out.print("Enter your choice to block: ");
+                blockedNumber = input.nextInt();
+                if(organizer.get(blockedNumber-1).getBlockingInfo()==false)
+                {
+                    organizer.get(blockedNumber-1).blockAccess();
+                    System.out.println("Account successfully blocked");
+                }
+                else
+                {
+                    System.out.println("Account already blocked");
+                }
+            }
+        }
+        else if (choice == 2)
+        {
+            if(player.isEmpty())
+            {
+                System.out.println("There's no player account!");
+            }
+            else
+            {
+                System.out.println("=====================");
+                System.out.println("||   PLAYER LIST   ||");
+                System.out.println("=====================");
+                for(int i = 0;i<player.size();i++)
+                {
+                    System.out.println((1+i) + " ");
+                    player.get(i).displayInfo();
+                }
+                System.out.print("Enter your choice to block: ");
+                blockedNumber = input.nextInt();
+                if(player.get(blockedNumber-1).getBlockingInfo()==false)
+                {
+                    player.get(blockedNumber-1).blockAccess();
+                    System.out.println("Account successfully blocked");
+                }
+                else
+                {
+                    System.out.println("Account already blocked");
+                }
+            }
+        }
+        else
+        {
+            System.out.println("Menu not exist!");
+        }
+    }
+    
+    //Method to verify accounts
+    public static void verifyAccount()
+    {
+        int choice, verifyedNumber;
+        Scanner input = new Scanner(System.in);
+        
+        System.out.println("====================");
+        System.out.println("||   VERIFY MENU   ||");
+        System.out.println("====================");
+        System.out.println("1. Organizer\n2. Player");
+        System.out.print("Enter your choice: ");
+        choice = input.nextInt();
+        if(choice == 1)
+        {
+            if(organizer.isEmpty())
+            {
+                System.out.println("There's no organizer account!");
+            }
+            else
+            {
+                System.out.println("========================");
+                System.out.println("||   ORGANIZER LIST   ||");
+                System.out.println("========================");
+                for(int i = 0;i<organizer.size();i++)
+                {
+                    System.out.println((1+i) + " ");
+                    organizer.get(i).displayInfo();
+                }
+                System.out.print("Enter your choice to verify: ");
+                verifyedNumber = input.nextInt();
+                if(organizer.get(verifyedNumber-1).getRegistrationInfo()==false)
+                {
+                    organizer.get(verifyedNumber-1).acceptRegistration();
+                    System.out.println("Account successfully verifyed");
+                }
+                else
+                {
+                    System.out.println("Account already verifyed");
+                }
+            }
+        }
+        else if (choice == 2)
+        {
+            if(player.isEmpty())
+            {
+                System.out.println("There's no player account!");
+            }
+            else
+            {
+                System.out.println("=====================");
+                System.out.println("||   PLAYER LIST   ||");
+                System.out.println("=====================");
+                for(int i = 0;i<player.size();i++)
+                {
+                    System.out.println((1+i) + " ");
+                    player.get(i).displayInfo();
+                }
+                System.out.print("Enter your choice to verify: ");
+                verifyedNumber = input.nextInt();
+                if(player.get(verifyedNumber-1).getRegistrationInfo()==false)
+                {
+                    player.get(verifyedNumber-1).acceptRegistration();
+                    System.out.println("Account successfully verifyed");
+                }
+                else
+                {
+                    System.out.println("Account already verifyed");
+                }
+            }
+        }
+        else
+        {
+            System.out.println("Menu not exist!");
+        }
+    }
+    
+    //Method to create announcement
+    public static void postAnnouncement(){
+        String post;
+        Scanner input = new Scanner(System.in);
+        System.out.println("===========================");
+        System.out.println("||   ANNOUNCEMENT MENU   ||");
+        System.out.println("===========================");
+        System.out.print("Insert announcement: ");
+        post = input.nextLine();
+        
+        //add to class admin through constructor
+        Admin create = new Admin(post);
+        announcement.add(create);
+    }
+    
+    //Method menu ADMIN
+    public static void menuAdmin()
+    {
+        try
+        {
+            int choice;
+            Scanner input = new Scanner(System.in);
+            do
+            {
+                System.out.println("====================");
+                System.out.println("||   ADMIN MENU   ||");
+                System.out.println("====================");
+                System.out.println("Welcome Admin!");
+                System.out.println("1. Complaint List\n2. Block Account\n3. Verify Account\n4. Post Announcement\n5. Log out");
+                System.out.print("Enter your choice [1-5]: ");
+                choice = input.nextInt();
+                switch(choice)
+                {
+                    case 1:
+                    {
+                        displayComplaint();
+                        enterToContinue();
+                        break;
+                    }
+                    case 2:
+                    {
+                        blockAccount();
+                        enterToContinue();
+                        break;
+                    }
+                    case 3:
+                    {
+                        verifyAccount();
+                        enterToContinue();
+                        break;
+                    }
+                    case 4:
+                    {
+                        postAnnouncement();
+                        enterToContinue();
+                        break;
+                    }
+                    case 5:
+                    {
+                        System.out.println("Log out successfully!");
+                        enterToContinue();
+                        break;
+                    }
+                }
+            }while(choice !=5); 
+        }catch(Exception e){
+            System.out.println("Menu that you enter is not found!");
+        }
+    }
+    
+    //Method to display organizer info that logged at that time
+    public static void displayOrganizerInfo(){
+        for(int i=0;i<organizer.size();i++)
+        {
+            if(organizer.get(i).getOrganizerName().equals(organizerName))
+            {
+                organizer.get(i).displayInfo();
+            }
+        }
+    }
+    
+    //Method to create contest
+    public static void createContest()
+    {
+        int choice, minNumber, maxNumber, cost;
+        String type, tier, date, venue;
+        Scanner input = new Scanner(System.in);
+        
+        System.out.println("======================");
+        System.out.println("||   CONTEST MENU   ||");
+        System.out.println("======================");
+        System.out.print("Input Sport Type [Badminton/Tennis/Swimming/Gymnastic]: ");
+        type = input.nextLine();
+        System.out.print("Input Sport Tier [Beginner/Intermediate/Advanced]: ");
+        tier = input.nextLine();
+        System.out.print("Input Contest Date: ");
+        date = input.nextLine();
+        System.out.print("Input Contest Venue: ");
+        venue = input.nextLine();
+        System.out.print("Input Minimal Number of Players: ");
+        minNumber = input.nextInt();
+        System.out.print("Input Maximal Number of Players: ");
+        maxNumber = input.nextInt();
+        System.out.print("Input Contest Cost: ");
+        cost = input.nextInt();
+        
+        //add data to contest class through constuctor
+        Organizer brand = new Organizer(organizerName);
+        Contest create = new Contest(type, tier, date, venue, minNumber, maxNumber, cost, brand);
+        contest.add(create);
+    }
+    
+    //Method to change contest status
+    public static void editContestStatus()
+    {
+        int editedNumber;
+        String choice;
+        Scanner input = new Scanner(System.in);
+        
+        System.out.println("======================");
+        System.out.println("||   EDIT CONTEST   ||");
+        System.out.println("======================");
+        if(contest.isEmpty())
+        {
+            System.out.println("There's no contest created yet!");
+        }
+        else
+        {
+            System.out.println("======================");
+            System.out.println("||   EDIT CONTEST   ||");
+            System.out.println("======================");
+            for(int i = 0;i<contest.size();i++)
+            {
+                System.out.println((1+i) + " ");
+                contest.get(i).displayInfo();
+            }
+            System.out.print("Enter your choice to edit: ");
+            editedNumber = input.nextInt();
+            if(organizer.get(editedNumber-1).getOrganizerName().equals(organizerName))
+            {
+                System.out.println("Do you want to proceed this contest [Yes/No]: ");
+                choice = input.nextLine();
+                if(choice.equalsIgnoreCase("Yes"))
+                {
+                    contest.get(editedNumber-1).processContest();
+                    System.out.println("Contest status: ");
+                    contest.get(editedNumber-1).getContestStatus();
+                }
+                else
+                {
+                    contest.get(editedNumber-1).cancelContest();
+                    System.out.println("Contest status: ");
+                    contest.get(editedNumber-1).getContestStatus();
+                }
+            }
+            else
+            {
+                System.out.println("This contest not belongs to your organizer!");
+            }
+        }   
+    }
+    
+    //Method to create complaint
+    public static void createComplaint()
+    {
+        String serviceComplaint, senderName;
+        Scanner input = new Scanner(System.in);
+        
+        System.out.println("========================");
+        System.out.println("||   COMPLAINT MENU   ||");
+        System.out.println("========================");
+        System.out.print("Input your Name: ");
+        senderName = input.nextLine();
+        System.out.print("Input your complaint: ");
+        serviceComplaint = input.nextLine();
+        Complaint create = new Complaint(serviceComplaint, senderName);
+        complaint.add(create);
+        System.out.println("Complaint succesfully sent!");
+    }
+    
+    //Method menu ORGANIZER
+    public static void menuOrganizer()
+    {
+        try
+        {
+            int choice;
+            Scanner input = new Scanner(System.in);
+            do
+            {
+                System.out.println("========================");
+                System.out.println("||   ORGANIZER MENU   ||");
+                System.out.println("========================");
+                System.out.println("Welcome Organizer!");
+                System.out.println("1. Account Info\n2. Create Contest\n3. Change Contest Status\n4. Make a Complaint\n5. Log out");
+                System.out.print("Enter your choice [1-5]: ");
+                choice = input.nextInt();
+                switch(choice)
+                {
+                    case 1:
+                    {
+                        displayOrganizerInfo();
+                        enterToContinue();
+                        break;
+                    }
+                    case 2:
+                    {
+                        createContest();
+                        enterToContinue();
+                        break;
+                    }
+                    case 3:
+                    {
+                        editContestStatus();
+                        enterToContinue();
+                        break;
+                    }
+                    case 4:
+                    {
+                        createComplaint();
+                        enterToContinue();
+                        break;
+                    }
+                    case 5:
+                    {
+                        System.out.println("Log out successfully!");
+                        enterToContinue();
+                        break;
+                    }
+                }
+            }while(choice !=5); 
+        }catch(Exception e){
+            System.out.println("Menu that you enter is not found!");
+        }
+    }
+    
+    //Method to display player info that logged at that time
+    public static void displayPlayerInfo(){
+        for(int i=0;i<player.size();i++)
+        {
+            if(player.get(i).getPlayerName().equals(playerName))
+            {
+                player.get(i).displayInfo();
+            }
+        }
+    }
+    
+    public static void joinContest()
+    {
+        int choice, joinedContest;
+        Scanner input = new Scanner(System.in);
+        
+        if(contest.isEmpty())
+        {
+            System.out.println("There's no contest yet!");
+        }
+        else
+        {
+            System.out.println("======================");
+            System.out.println("||   CONTEST LIST   ||");
+            System.out.println("======================");
+            for(int i = 0;i<contest.size();i++)
+            {
+                System.out.println((1+i) + " ");
+                contest.get(i).displayInfo();
+            }
+            System.out.println("Enter your choice to join: ");
+            joinedContest = input.nextInt();
+            Player name = new Player(playerName);
+            if(!contest.get(joinedContest-1).getPlayerName(playerName).equals(playerName))
+            {
+                contest.get(joinedContest-1).setPlayerName(name);
+                for(int i=0;i<player.size();i++)
+                {
+                    if(player.get(i).getPlayerName().equals(playerName))
+                    {
+                        player.get(i).levelUp();
+                    }
+                }
+                System.out.println("You've sucessfully join the contest!");
+            }
+            else
+            {
+                System.out.println("You've already joined this contest!");   
+            }
+        }
+    }
+    
+    public static void cancelJoin()
+    {
+        int cancelledNumber;
+        String choice, condition = "off";
+        Scanner input = new Scanner(System.in);
+        
+        if(contest.isEmpty())
+        {
+            System.out.println("There's no contest created yet!");
+        }
+        else
+        {
+            System.out.println("=====================");
+            System.out.println("||   CANCEL JOIN   ||");
+            System.out.println("=====================");
+            for(int i = 0;i<contest.size();i++)
+            {
+                System.out.println((1+i) + " ");
+                contest.get(i).displayInfo();
+            }
+            System.out.print("Enter your choice to cancel: ");
+            cancelledNumber = input.nextInt();
+            if(player.get(cancelledNumber-1).getPlayerName().equals(playerName))
+            {
+                System.out.println("Do you want to cancel to join this contest [Yes/No]: ");
+                choice = input.nextLine();
+                if(choice.equalsIgnoreCase("Yes"))
+                {
+                    for(int i=0; i<contest.size();i++)
+                    {
+                        if(contest.get(i).getPlayerName(playerName).equals(playerName))
+                        {
+                            condition = "on";
+                            System.out.println("You've cancelled to join the contest");
+                            contest.get(i).cancelJoin(playerName);
+                            
+                        }
+                    }
+                    if(condition == "on")
+                    {
+                        for(int i=0;i<player.size();i++)
+                        {
+                            if(player.get(i).getPlayerName().equals(playerName))
+                            {
+                                player.get(i).lowerLevel();
+                            }
+                        }
+                    }
+                }
+            }
+            else
+            {
+                System.out.println("You're not joined this contest!");
+            }
+        }
+    }
+    
+    //Method to give badge
+    public static void giveBadge()
+    {
+        int givedNumber;
+        String badge;
+        Scanner input = new Scanner(System.in);
+        System.out.println("=========================");
+        System.out.println("||   GIVE BADGE MENU   ||");
+        System.out.println("=========================");
+        if(player.isEmpty())
+        {
+            System.out.println("There's no player yet!");
+        }
+        else
+        {
+            System.out.println("Player name:");
+            for(int i = 0;i<player.size();i++)
+            {
+                System.out.println((1+i) + ". ");
+                player.get(i).getPlayerName();
+            }
+            System.out.print("Enter your choice to give the badge: ");
+            givedNumber = input.nextInt();
+            if(!player.get(givedNumber-1).getPlayerName().equals(playerName))
+            {
+                System.out.print("Input badge [Friendly/Team Work/Great Peformer]: ");
+                badge = input.nextLine();
+                player.get(givedNumber-1).setBadge(badge);
+            }
+            else
+            {
+                System.out.print("You've cannot give to this player!");
+            }
+        }
+    }
+    
+    //Method menu PLAYER
+    public static void menuPlayer()
+    {
+        try
+        {
+            int choice;
+            Scanner input = new Scanner(System.in);
+            do
+            {
+                System.out.println("=====================");
+                System.out.println("||   PLAYER MENU   ||");
+                System.out.println("=====================");
+                System.out.println("Welcome Player!");
+                System.out.println("1. Account Info\n2. Join Contest\n3. Cancel join\n4. Give Badge\n5. Make a Complaint\n6. Log out");
+                System.out.print("Enter your choice [1-5]: ");
+                choice = input.nextInt();
+                switch(choice)
+                {
+                    case 1:
+                    {
+                        displayPlayerInfo();
+                        enterToContinue();
+                        break;
+                    }
+                    case 2:
+                    {
+                        joinContest();
+                        enterToContinue();
+                        break;
+                    }
+                    case 3:
+                    {
+                        cancelJoin();
+                        enterToContinue();
+                        break;
+                    }
+                    case 4:
+                    {
+                        giveBadge();
+                        enterToContinue();
+                        break;
+                    }
+                    case 5:
+                    {
+                        createComplaint();
+                        enterToContinue();
+                        break;
+                    }
+                    case 6:
+                    {
+                        System.out.println("Log out successfully!");
+                        enterToContinue();
+                        break;
+                    }
+                }
+            }while(choice !=5); 
+        }catch(InputMismatchException ex){
+            System.out.println("Menu that you enter is not found!");
+        }
+    }
+}
