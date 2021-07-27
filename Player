@@ -1,0 +1,110 @@
+package sportpedia;
+import java.io.Serializable;
+import java.util.ArrayList;
+
+public class Player extends TypeAccount implements Serializable
+{
+    private String playerName;
+    private String playerPhoneNumber;
+    private int playerLevel;
+    private ArrayList<String> playerBadge = new ArrayList<String>();
+    private String playerUsername;
+    private String playerPassword;
+    private boolean playerAccept;
+    private boolean playerBlock;
+    
+    //Constructor
+    public Player(String playerName, String playerPhoneNumber, String playerUsername, String playerPassword)
+    {
+        this.playerName = playerName;
+        this.playerPhoneNumber = playerPhoneNumber;
+        this.playerLevel = 0;
+        this.playerUsername = playerUsername;
+        this.playerPassword = playerPassword;
+        this.playerAccept = false;
+        this.playerBlock = false;
+    }
+    
+    public Player(String playerName)
+    {
+        this.playerName = playerName;
+    }
+    
+    //Method Getter
+    public String getPlayerName()
+    {
+        return playerName;
+    }
+    
+    public String getPlayerPhoneNumber()
+    {
+        return playerPhoneNumber;
+    }
+    
+    public String getPlayerUsername()
+    {
+        return playerUsername;
+    }
+    
+    public String getPlayerPassword()
+    {
+        return playerPassword;
+    }
+    
+    public boolean getRegistrationInfo()
+    {
+        return playerAccept;
+    }
+    
+    public boolean getBlockingInfo()
+    {
+        return playerBlock;
+    }
+    
+    //Method Setter
+    public void setBadge(String playerBadge)
+    {
+        this.playerBadge.add(playerBadge);
+    }
+    
+    // Override method from parent class (abstract)
+    @Override
+    public void acceptRegistration()
+    {
+        this.playerAccept = true;
+    }
+    
+    @Override
+    public void blockAccess()
+    {
+        this.playerBlock = true;
+    }
+    
+    //Method lainnya
+    public void displayInfo()
+    {
+        System.out.println("1. Name: " + playerName + "\n2. Phone Number: " + playerPhoneNumber +  "\n3. Level: " + playerLevel + "\n4. Account Username: " + playerUsername + "\n5. Account Password: " + playerPassword);
+        if(playerBadge.isEmpty())
+        {
+            System.out.println("You have no badges!");
+        }
+        else
+        {
+            System.out.println("6. Badges: ");
+            for(int i=0;i<playerBadge.size();i++)
+            {
+                System.out.println("  - " + playerBadge.get(i));
+            }
+        }
+    }
+    
+    public void levelUp()
+    {
+        this.playerLevel ++;
+    }
+        
+     public void lowerLevel()
+    {
+        this.playerLevel --;
+    }
+}
