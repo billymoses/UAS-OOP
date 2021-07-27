@@ -1,0 +1,25 @@
+package sportpedia;
+import java.io.Serializable;
+
+public class Admin implements Serializable
+{
+    private String announcement;
+    
+    //Constructor
+    public Admin(String announcement)
+    {
+        this.announcement = announcement;
+    } 
+    
+    //Method Setter
+    public void setAnnouncement(String announcement)
+    {
+        this.announcement = announcement;
+    }
+    
+    //Method Getter
+    public String getAnnouncement()
+    {
+        return announcement;
+    }
+}
