@@ -1,0 +1,32 @@
+package sportpedia;
+import java.io.Serializable;
+
+public class Complaint implements Serializable
+{
+    private String serviceComplaint;
+    private String senderName;
+    
+    //Constructor
+    public Complaint(String serviceComplaint, String senderName)
+    {
+        this.serviceComplaint = serviceComplaint;
+        this.senderName = senderName;
+    }
+    
+    //Method getter
+    public String getServiceComplaint()
+    {
+        return serviceComplaint;
+    }
+    
+    public String getSenderName()
+    {
+        return senderName;
+    }
+    
+    //Method lainnya
+    public void displayInfo()
+    {
+        System.out.println("1. Complaint: " + serviceComplaint + "2. Sender: " + senderName);
+    }
+}
