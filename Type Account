@@ -1,0 +1,9 @@
+package sportpedia;
+
+//Abstract class as Parent class
+public abstract class TypeAccount 
+{
+    //Declare abstract methods without body
+    public abstract void acceptRegistration();
+    public abstract void blockAccess();
+}
