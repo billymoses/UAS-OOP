@@ -1,0 +1,78 @@
+package sportpedia;
+import java.io.Serializable;
+
+public class Organizer extends TypeAccount implements Serializable
+{
+    private String organizerName;
+    private String organizerPhoneNumber;
+    private String organizerUsername;
+    private String organizerPassword;
+    private boolean organizerAccept;
+    private boolean organizerBlock;
+    
+    //Constructor
+    public Organizer(String organizerName, String organizerPhoneNumber, String organizerUsername, String organizerPassword)
+    {
+        this.organizerName = organizerName;
+        this.organizerPhoneNumber = organizerPhoneNumber;
+        this.organizerUsername = organizerUsername;
+        this.organizerPassword = organizerPassword;
+        this.organizerAccept = false;
+        this.organizerBlock = false;  
+    }    
+    
+    public Organizer(String organizername)
+    {
+        this.organizerName = organizerName;
+    }
+    
+    //Method Getter
+    public String getOrganizerName()
+    {
+        return organizerName;
+    }
+    
+    public String getOrganizerPhoneNumber()
+    {
+        return organizerPhoneNumber;
+    }
+    
+    public String getOrganizerUsername()
+    {
+        return organizerUsername;
+    }
+    
+    public String getOrganizerPassword()
+    {
+        return organizerPassword;
+    }
+    
+    public boolean getRegistrationInfo()
+    {
+        return organizerAccept;
+    }
+    
+    public boolean getBlockingInfo()
+    {
+        return organizerBlock;
+    }
+    
+    // Override method from parent class (abstract)
+    @Override
+    public void acceptRegistration()
+    {
+        this.organizerAccept = true;
+    }
+    
+    @Override
+    public void blockAccess()
+    {
+        this.organizerBlock = true;
+    }
+    
+    //method lainnya
+    public void displayInfo()
+    {
+        System.out.println("1. Name: " + organizerName + "\n2. Phone Number: " + organizerPhoneNumber +  "\n3. Account Username: " + organizerUsername + "\n4. Account Password: " + organizerPassword);
+    }   
+}
