@@ -1,0 +1,129 @@
+package sportpedia;
+import java.io.Serializable;
+import java.util.ArrayList;
+
+public class Contest implements Serializable
+{
+    private String sportType;
+    private String sportTier;
+    private String contestDateHeld;
+    private String contestVenue;
+    private int minNumberPlayer;
+    private int maxNumberPlayer;
+    private int contestCost;
+    private String contestStatus;
+    private int totalPlayer;
+    private Organizer contestOrganizer; // organizer that held the 
+    private ArrayList<Player> playerList = new ArrayList<Player>(); //List of player that join the contest
+    
+    //Constructor
+    public Contest(String sportType, String sportTier, String contestDateHeld, String contestVenue, int minNumberPlayer, int maxNumberPlayer, int contestCost, Organizer contestOrganizer)
+    {
+        this.sportType = sportType;
+        this.sportTier = sportTier;
+        this.contestDateHeld = contestDateHeld;
+        this.contestVenue = contestVenue;
+        this.minNumberPlayer = minNumberPlayer;
+        this.maxNumberPlayer = maxNumberPlayer;
+        this.contestCost = contestCost;
+        this.contestStatus = "Not started yet";
+        this.contestOrganizer = contestOrganizer;
+        this.totalPlayer = 0;   
+    }
+    
+    //Method setter
+    public void setPlayerName(Player join){
+        this.playerList.add(join);
+        this.totalPlayer++;
+    }
+    
+    //method getter
+    public String getSportType(){
+        return sportType;
+    }
+    
+    public String getSportTier(){
+        return sportTier;
+    }
+    
+    public String getContestDateHeld(){
+        return contestDateHeld;
+    }
+    
+    public String getContestVenue(){
+        return contestVenue;
+    }
+    
+    public int getMinNumberPlayer(){
+        return minNumberPlayer;
+    }
+    
+    public int getMaxNumberPlayer(){
+        return maxNumberPlayer;
+    }
+    
+    public int getContestCost(){
+        return contestCost;
+    }
+    
+    public String getContestStatus(){
+        return contestStatus;
+    }
+    
+    public int getTotalPlayer(){
+        return totalPlayer;
+    }
+    
+    public String getContestOrganizer(){
+        return contestOrganizer.getOrganizerName();
+    }
+    
+    public String getPlayerName(String name){
+        for(int i=0;i<playerList.size();i++)
+        {
+            if(playerList.get(i).getPlayerName().equals(name))
+            return name;
+        }
+        return toString();
+    }
+    
+    //Method lainnya
+    public void processContest(){
+        if(totalPlayer>=minNumberPlayer && totalPlayer<=maxNumberPlayer)
+        {
+            this.contestStatus = "Ready to be start soon!";
+        } 
+        else if(totalPlayer<minNumberPlayer)
+        {
+            this.contestStatus = "Cancelled due to lack of players!";
+        }
+    }
+    
+    public void cancelContest()
+    {
+        this.contestStatus = "Cancelled due to lack of players!";
+    }
+    
+    public void cancelJoin(String name){
+        for(int i=0;i<playerList.size();i++)
+        {
+            if(playerList.get(i).getPlayerName().equals(name))
+            {
+               this.playerList.remove(i); 
+            }
+        }
+        this.totalPlayer--;
+    }
+    
+    public void displayInfo(){
+        System.out.println("a. Sport Type: " + sportType);
+        System.out.println("b. Sport Tier: " + sportTier);
+        System.out.println("c. Date: " + contestDateHeld);
+        System.out.println("d. Venue" + contestVenue);
+        System.out.println("e. Minimal player: " + minNumberPlayer);
+        System.out.println("f. Maximal player: " + maxNumberPlayer);
+        System.out.println("g. Cost: " + contestCost);
+        System.out.println("h. Status: " + contestStatus);
+        System.out.println("i. Total Player for Now: " + totalPlayer);
+    }
+}
